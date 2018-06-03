@@ -5,7 +5,7 @@ var logger = require("morgan");
 
 //for db
 var mongoose = require("mongoose");
-// var db = require("./models");
+var db = require("./models");
 
 //for scraping
 var cheerio = require("cheerio");
@@ -34,8 +34,20 @@ var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper";
 mongoose.Promise = Promise;
 mongoose.connect(MONGODB_URI);
 
+// mongoose.connect("mongodb://localhost/mongoScraper");
+
 //routes...
-//get articles from nbcNews
+//home route
+app.get("/", function(req, res){
+  res.render("../views/pages/home");
+});
+
+//saved articles route
+app.get("/saved", function(req, res){
+  res.render("../views/pages/saved");
+});
+
+//scrape articles from nbcNews
 app.get("/scrape", function(req, res){
   //get html body with axios
   axios.get("https://www.nbcnews.com/news/weird-news").then(function(response) {
@@ -47,13 +59,48 @@ app.get("/scrape", function(req, res){
       //save everythig in obj
       var results ={};
 
-      console.log(element);
+      // console.log(element.children[0].data.trim());
+      // console.log(element.parent.attribs);
+      var title = element.children[0].data.trim();
+      var link = element.parent.attribs;
 
-      // results.link = $(element).children().attr("href");
-      // results.title = $(element).children().text();
+      // console.log(element);
+      // console.log(element.children);
+      // console.log(element.parent);
+      // console.log(element.namespace);
+      console.log(element.parent.attribs);
 
+      if (link = "(.*?)/g") {
+        if (title !== "" && link !== "") {
+          results.title = title;
+          results.link = "https://www.nbcnews.com" + link;
+        }
+      }
+
+      // console.log(results);
+
+      //construct new Article using results
+      db.Article.create(results)
+      .then(function(dbArticle){
+        console.log(dbArticle);
+      })
+      .catch(function(err){
+        return res.json(err);
+      })
+    });
+  res.send("Articles scraped!");
   })
+});
+
+//get all articles from db
+app.get("/articles", function(req, res){
+  db.Article.find({})
+  .then(function(dbArticle){
+    res.json(dbArticle);
   })
+  .catch(function(err){
+    res.json(err);
+  });
 });
 
 app.listen(PORT, function() {

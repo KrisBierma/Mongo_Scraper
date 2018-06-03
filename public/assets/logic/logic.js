@@ -1,25 +1,4 @@
 $(document).ready(function(){
-// var cheerio = require("cheerio");
-// var request = require("request");
-
-//show new articles on page load
-// request("http://www.nytimes.com", function(error, response, html) {
-//   var $ = cheerio.load(html);
-//   var results = [];
-
-//   $("h2.story-heading").each(function(index, element){
-//     var link = $(element).children().attr("href");
-//     var title = $(element).children().text();
-
-//     results.push({
-//       title:title,
-//       link:link
-//     });
-
-//     // renderArticles(results);
-//     console.log(element);
-//   })
-// });
 
 function renderArticles(results){
   var newCard = $("<div>").addClass("card");
@@ -40,10 +19,12 @@ function renderArticles(results){
 //clicked "scrape new articles" btn from home page
 $("#scrapeNew").on("click", function(){
   alert("hi");
+  // $.getJSON("/scrape", function(data){
+  //   renderArticles(data);
+  // });
 });
 
-//click "save article" from home page
-
+//click "save article" from home pages
 //click "delete from saved" from saved page
 
 //click "article notes" from saved page
