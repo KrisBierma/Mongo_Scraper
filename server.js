@@ -27,7 +27,7 @@ app.engine("hbs", exphbs({
 app.set("view engine", "hbs");
 
 // If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper";
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper2";
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
@@ -47,46 +47,43 @@ app.get("/saved", function(req, res){
   res.render("../views/pages/saved");
 });
 
-//scrape articles from nbcNews
+//scrape articles from website
 app.get("/scrape", function(req, res){
   //get html body with axios
-  axios.get("https://www.nbcnews.com/news/weird-news").then(function(response) {
+  axios.get("https://www.nytimes.com/").then(function(response) {
+
   //set up cheerio to load and sift through html
     var $ = cheerio.load(response.data);
 
     //get all the h3 tags from website
-    $("h3.item-heading").each(function(index, element){
-      //save everythig in obj
+    $("article.story").each(function(index, element){
+
       var results ={};
 
-      // console.log(element.children[0].data.trim());
-      // console.log(element.parent.attribs);
-      var title = element.children[0].data.trim();
-      var link = element.parent.attribs;
+      var link = ($(element).children("a").attr("href"));
+      var title = $(element).children("h2").text().trim();
+      var summary;
 
-      // console.log(element);
-      // console.log(element.children);
-      // console.log(element.parent);
-      // console.log(element.namespace);
-      console.log(element.parent.attribs);
+      //make sure title and link aren't empty (ie avoid ads)
+      if (title !== "" && title !== undefined && link !== undefined){
+        summary = $(element).children("p.summary").text().trim();
 
-      if (link = "(.*?)/g") {
-        if (title !== "" && link !== "") {
-          results.title = title;
-          results.link = "https://www.nbcnews.com" + link;
-        }
+        results.title = title;
+        results.link = link;
+        results.summary = summary;
+
+        console.log(results);
       }
 
-      // console.log(results);
+        // construct new Article using results
+        db.Article.create(results)
+        .then(function(dbArticle){
+          // console.log(dbArticle);
+        })
+        .catch(function(err){
+          return res.json(err);
+        })   
 
-      //construct new Article using results
-      db.Article.create(results)
-      .then(function(dbArticle){
-        console.log(dbArticle);
-      })
-      .catch(function(err){
-        return res.json(err);
-      })
     });
   res.send("Articles scraped!");
   })

@@ -1,27 +1,26 @@
 $(document).ready(function(){
 
 function renderArticles(results){
-  var newCard = $("<div>").addClass("card");
-  // var newImg = $("<img>").attr("src", results.)//how to get pic???
-  // newImg.attr("alt", results.)
-  var newBody = $("<div>").addClass("card-body");
-  var newTitle = $("<h5>").addClass("card-title").text(results.title);
-  // var newText = $("<p>").addClass("card-text").text(results.)
-  var newLink = $("<a>").attr("href", results.link).addClass("btn").text("Go to NYT");
+  for (var i=0; i< 20; i++){
+    var newCard = $("<div>").addClass("card");
+    var newBody = $("<div>").addClass("card-body");
+    var newTitle = $("<h5>").addClass("card-title").text(results[i].title);
+    var newText = $("<p>").addClass("card-text").text(results[i].summary);
+    console.log(results[i].summary);
+    var newLink = $("<a>").attr("href", results[i].link).addClass("btn").text("Go to NYT");
+    newLink.attr("target", "_blank");
 
-  // newBody.append(newTitle, newText, newLink); //keep
-  // newCard.append(newBody, newImg);  //keep
-  newBody.append(newTitle, newLink);
-  newCard.append(newBody);
-  $("#allArticles").append(newCard);
+    newBody.append(newTitle, newText, newLink);
+    newCard.append(newBody);
+    $("#allArticles").append(newCard);     
+  }
 }
 
 //clicked "scrape new articles" btn from home page
 $("#scrapeNew").on("click", function(){
-  alert("hi");
-  // $.getJSON("/scrape", function(data){
-  //   renderArticles(data);
-  // });
+  $.getJSON("/articles", function(data) {
+    renderArticles(data);
+  });
 });
 
 //click "save article" from home pages
