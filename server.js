@@ -105,6 +105,53 @@ app.get("/articles", function(req, res){
   });
 });
 
+//get one article to add notes
+app.get("/articles/:id", function(req, res){
+  db.Article.findOne(
+    {_id: req.params.id}
+  )
+  .populate("note")
+  .then(function(dbArticle){
+    res.json(dbArticle);
+  })
+  .catch(function(err){
+    res.json(err);
+  });
+});
+
+//update article's "saved" field
+app.put("/articles/:id", function(req,res){
+  console.log(req.params.id);
+  db.Article.findOneAndUpdate(
+    { _id: req.params.id }, 
+    { $set: {saved: req.body.saved }},
+    { new: true }
+  )
+  .then(function(dbArt){
+    res.json(dbArt);
+  })
+  .catch(function(err){
+    res.json(err);
+  })
+});
+
+//save article's note
+app.post("/articles/:id", function(req, res){
+  db.Note.create(req.body)
+  .then(function(dbNote){
+    returndb.Article.findOneAndUpdate(
+      {_id: req.params.id},
+      {note: dbNote._id},
+      {new: true});
+  })
+  .then(function(dbArticle){
+    res.json(dbArticle);
+  })
+  .catch(function(err){
+    res.json(err);
+  });
+});
+
 app.listen(PORT, function() {
   console.log("App listening on PORT" + PORT);
 });
