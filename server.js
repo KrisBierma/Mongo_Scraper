@@ -27,7 +27,7 @@ app.engine("hbs", exphbs({
 app.set("view engine", "hbs");
 
 // If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper2";
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper3";
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
@@ -55,34 +55,39 @@ app.get("/scrape", function(req, res){
   //set up cheerio to load and sift through html
     var $ = cheerio.load(response.data);
 
+    var count = 0;
+
     //get all the h3 tags from website
     $("article.story").each(function(index, element){
 
       var results ={};
 
-      var link = ($(element).children("a").attr("href"));
-      var title = $(element).children("h2").text().trim();
-      var summary;
+      var link = $(element).children("h2.story-heading").children("a").attr("href");
+      var title = $(element).children("h2.story-heading").children("a").text().trim();
+      var summary = $(element).children("p.summary").text().trim();
+      console.log("link: "+ link);
+      console.log("title: "+title);
 
-      //make sure title and link aren't empty (ie avoid ads)
-      if (title !== "" && title !== undefined && link !== undefined){
-        summary = $(element).children("p.summary").text().trim();
+      //filter out ads and junk
+      if (typeof title !== "undefined" && typeof link !== "undefined"){
 
         results.title = title;
         results.link = link;
         results.summary = summary;
 
-        console.log(results);
-      }
+        // count++;
+        // console.log(count+" new articles added");
 
         // construct new Article using results
         db.Article.create(results)
         .then(function(dbArticle){
-          // console.log(dbArticle);
         })
         .catch(function(err){
           return res.json(err);
-        })   
+        })         
+      }
+
+  
 
     });
   res.send("Articles scraped!");
