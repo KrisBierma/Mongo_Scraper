@@ -65,8 +65,6 @@ app.get("/scrape", function(req, res){
       var link = $(element).children("h2.story-heading").children("a").attr("href");
       var title = $(element).children("h2.story-heading").children("a").text().trim();
       var summary = $(element).children("p.summary").text().trim();
-      // console.log("link: "+ link);
-      // console.log("title: "+title);
 
       //filter out ads and junk
       if (typeof title !== "undefined" && typeof link !== "undefined"){
@@ -105,7 +103,6 @@ app.get("/articles", function(req, res){
 app.get("/articles/:id", function(req, res){
   db.Article.findById(
     {_id: req.params.id}, function(err, data){
-      // console.log(data);
     })
   .populate("note")
   .then(function(dbArticle){
