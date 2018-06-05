@@ -27,7 +27,7 @@ app.engine("hbs", exphbs({
 app.set("view engine", "hbs");
 
 // If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper3";
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper4";
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
@@ -65,8 +65,8 @@ app.get("/scrape", function(req, res){
       var link = $(element).children("h2.story-heading").children("a").attr("href");
       var title = $(element).children("h2.story-heading").children("a").text().trim();
       var summary = $(element).children("p.summary").text().trim();
-      console.log("link: "+ link);
-      console.log("title: "+title);
+      // console.log("link: "+ link);
+      // console.log("title: "+title);
 
       //filter out ads and junk
       if (typeof title !== "undefined" && typeof link !== "undefined"){
@@ -75,22 +75,18 @@ app.get("/scrape", function(req, res){
         results.link = link;
         results.summary = summary;
 
-        // count++;
-        // console.log(count+" new articles added");
-
         // construct new Article using results
         db.Article.create(results)
         .then(function(dbArticle){
+          count++;
         })
         .catch(function(err){
           return res.json(err);
         })         
       }
-
-  
-
     });
   res.send("Articles scraped!");
+  console.log(count+" new articles added");
   })
 });
 
@@ -107,9 +103,10 @@ app.get("/articles", function(req, res){
 
 //get one article to add notes
 app.get("/articles/:id", function(req, res){
-  db.Article.findOne(
-    {_id: req.params.id}
-  )
+  db.Article.findById(
+    {_id: req.params.id}, function(err, data){
+      // console.log(data);
+    })
   .populate("note")
   .then(function(dbArticle){
     res.json(dbArticle);
@@ -121,7 +118,7 @@ app.get("/articles/:id", function(req, res){
 
 //update article's "saved" field
 app.put("/articles/:id", function(req,res){
-  console.log(req.params.id);
+  // console.log(req.params.id);
   db.Article.findOneAndUpdate(
     { _id: req.params.id }, 
     { $set: {saved: req.body.saved }},
@@ -137,9 +134,10 @@ app.put("/articles/:id", function(req,res){
 
 //save article's note
 app.post("/articles/:id", function(req, res){
+  // console.log("here: "+req.params.id);
   db.Note.create(req.body)
   .then(function(dbNote){
-    returndb.Article.findOneAndUpdate(
+    return db.Article.findByIdAndUpdate(
       {_id: req.params.id},
       {note: dbNote._id},
       {new: true});

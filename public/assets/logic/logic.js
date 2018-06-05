@@ -27,14 +27,14 @@ function renderArticles(results){
 
     //if article is saved, add "delete" & "notes" btns
     if (results[i].saved){
-      newBtn = $("<a>").addClass("btn btn-outline-secondary deleteArticle").text("Delete from saved");
+      newBtn = $("<a>").addClass("btn deleteArticle").text("Delete from saved");
 
-      newBtn2 = $("<a>").addClass("btn btn-outline-secondary articleNotes").text("Article notes");
+      newBtn2 = $("<a>").addClass("btn articleNotes").text("Article notes");
       newBtn2.attr({"dataId": results[i]._id, "type": "button", "data-target": "#notesModal", "data-toggle": "modal"});
     }
     //else add "save article"
     else {
-      newBtn = $("<a>").addClass("btn btn-outline-secondary saveArticle").text("Save article");
+      newBtn = $("<a>").addClass("btn saveArticle").text("Save article");
     }
       newBtn.attr("dataId", results[i]._id);
       newBtn.attr("type", "button");
@@ -112,12 +112,8 @@ $(document).on("click", ".deleteArticle", function(){
 
 //click "article notes" pops up notes modal
 $(document).on("click", ".articleNotes", function(){
-  // $("#notes").empty();
   var thisId = $(this).attr("dataId");
   console.log(thisId);
-
-  // getElement("#notesModal").modal("show");
-  document.getElementById("notesModal").showModal();
 
   //ajax call for the specific article
   $.ajax({
@@ -126,33 +122,44 @@ $(document).on("click", ".articleNotes", function(){
   })
   //add modal to page
   .then(function(data){
-    console.log(data);
-    
-  });
 
+    //give save btn article title
+    $("#articleTitle").text(data.title);
+
+    //give save btn an id
+    $("#saveNotes").attr("dataid", thisId);
+
+    console.log(data.note);
+    //if there's already a note, show it
+    if (data.note){
+      $("#notesTitle").val(data.note.title);
+      $("#notesBody").html(data.note.body);
+    }
+  });
 });
 
 //click "save article notes"
 $(document).on("click", "#saveNotes", function(){
   var thisId = $(this).attr("dataId");
+  var ntitle=$("#notesTitle").val();
+  var nbody = $("#notesBody").val();
+  console.log(ntitle, nbody);
 
   //api post request
   $.ajax({
     method: "POST",
     url: "/articles/" + thisId,
     data: {
-      title: $("#noteTitle").val(),
-      body: $("#noteBody").val()
+      title: ntitle,
+      body: nbody
     }
   })
   .then(function(data){
     console.log(data);
-    $("#notes").empty();
-  });
 
-  //clear notes modal
-  $("#notesTitle").val("");
-  $("#notesBody").val("");
+    $("#notesTitle").val("");  
+    $("#notesBody").val("");
+  });
 })
 
 }) //end document.ready

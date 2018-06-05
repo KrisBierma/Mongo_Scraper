@@ -22,7 +22,6 @@ var ArticleSchema = new Schema({
     required: false,
     default: false
   },
-  // unique: true,
   //note obj stores Note id so we can populate article with the notes that go with it
   note: {
     type: Schema.Types.ObjectId,

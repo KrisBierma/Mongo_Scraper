@@ -1,1 +1,25 @@
 img{width:100%;}
+h5.card-title{
+  color:#ff571a;
+}
+.btn{
+  background-color:#79563a;
+  color:white !important;
+  margin:5px;
+}
+.navbar-brand{
+  font-family: 'Lobster', cursive;
+  font-size: 39px;
+}
+ul.navbar-nav{
+  line-height: 39px;
+}
+#navbarNav{
+  justify-content: flex-end;
+}
+a.nav-link{
+  color:black !important;
+}
+a:hover{
+  color:#79563a !important;
+}
