@@ -48,18 +48,19 @@ function renderArticles(results){
     //if article is saved, add to saved page and change buttons
     if (results[i].saved){
       newBody.append(newBtn2);
-      $("#savedArticles").append(newCard);
+      $("#savedArticles").prepend(newCard);
     }  
     //otherwise put them on the home page
     else {
-      $("#allArticles").append(newCard); 
+      $("#allArticles").prepend(newCard); 
     }  
   }
 }
 
 //clicked "scrape new articles" btn from home page
 $("#scrapeNew").on("click", function(){
-  console.log("hi");
+    window.location.href="/";
+    console.log("here")  
   //need to scrape to set up db for first time
   $.ajax({
     method: "GET",
@@ -70,7 +71,9 @@ $("#scrapeNew").on("click", function(){
     $.getJSON("/articles", function(data) {
       console.log("articles scraped");
     });
-  })
+
+  });
+
 
 });
 
@@ -129,11 +132,18 @@ $(document).on("click", ".articleNotes", function(){
     //give save btn an id
     $("#saveNotes").attr("dataid", thisId);
 
-    console.log(data.note);
+
     //if there's already a note, show it
-    if (data.note){
+    if (data.note !== undefined){
+      console.log("here")
       $("#notesTitle").val(data.note.title);
       $("#notesBody").html(data.note.body);
+         console.log(data.note);
+ 
+    }
+    else {
+      $("#notesTitle").val("");  
+      $("#notesBody").val("");
     }
   });
 });
@@ -155,10 +165,7 @@ $(document).on("click", "#saveNotes", function(){
     }
   })
   .then(function(data){
-    console.log(data);
-
-    $("#notesTitle").val("");  
-    $("#notesBody").val("");
+    console.log("here:" +data);
   });
 })
 
