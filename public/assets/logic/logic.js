@@ -137,7 +137,7 @@ $(document).on("click", ".articleNotes", function(){
     if (data.note !== undefined){
       console.log("here")
       $("#notesTitle").val(data.note.title);
-      $("#notesBody").html(data.note.body);
+      $("#notesDone").html(data.note.body);
          console.log(data.note);
  
     }

@@ -23,3 +23,10 @@ a.nav-link{
 a:hover{
   color:#79563a !important;
 }
+#notesDone{
+  margin-bottom:45px;
+  font-size:18px;
+}
+#articleTitle{
+  color:#ff571a;
+}
